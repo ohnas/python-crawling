@@ -21,38 +21,73 @@ def today_idiom(headers):
     return daily_tuple
 
 
+def all_idioms(headers):
+    letters = [
+        # "a",
+        # "b",
+        # "c",
+        # "d",
+        # "e",
+        # "f",
+        # "g",
+        # "h",
+        # "i",
+        # "j",
+        # "k",
+        # "l",
+        # "m",
+        # "n",
+        # "o",
+        # "p",
+        # "q",
+        # "r",
+        # "s",
+        # "t",
+        # "u",
+        # "v",
+        # "w",
+        # "x",
+        "y",
+        # "z",
+    ]
+    last_page_numbers = []
+    for letter in letters:
+        url = f"https://www.theidioms.com/{letter}/"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        pno = soup.find("p", {"class": "pno"}).text.replace("Page 1 of ", "")
+        last_page_numbers.append(
+            {
+                "letter": letter,
+                "last_page_number": int(pno),
+            }
+        )
+    idioms_list = []
+    for item in last_page_numbers:
+        for num in range(item["last_page_number"]):
+            url = f"https://www.theidioms.com/{item['letter']}/page/{num + 1}/"
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+            phrase = soup.find("div", id="phrase")
+            idioms = phrase.find_all("article", {"class": "idiom"})
+            for idiom in idioms:
+                name = idiom.contents[0].find("a").text
+                link = idiom.contents[0].find("a")["href"]
+                meaning = idiom.contents[1].text
+                example = idiom.contents[2].text.replace("Read more ➺", "").rstrip()
+                idioms_list.append((name, link, meaning, example))
+
+    return idioms_list
+
+
 try:
+    print("crawling...")
     idiom = today_idiom(HEADERS)
-    print(idiom)
+    idioms = all_idioms(HEADERS)
+    print("finish!")
 except requests.exceptions.HTTPError as err:
     print(f"HTTP error occurred: {err}")
 except Exception as err:
     print(f"An error occurred: {err}")
-
-
-# https://www.theidioms.com/a/page/2/
-
-# response = requests.get(URL, headers=HEADERS)
-
-# if response.status_code == 200:
-#     soup = BeautifulSoup(response.text, "html.parser")
-#     phrase = soup.find("div", id="phrase")
-#     idioms = phrase.find_all("article", {"class": "idiom"})
-#     idioms_list = []
-#     for idiom in idioms:
-#         name = idiom.contents[0].find("a").text
-#         link = idiom.contents[0].find("a")["href"]
-#         meaning = idiom.contents[1].text
-#         example = idiom.contents[2].text.replace("Read more ➺", "").rstrip()
-#         idioms_list.append(
-#             {
-#                 "name": name,
-#                 "link": link,
-#                 "meaning": meaning,
-#                 "example": example,
-#             }
-#         )
-#     print(idioms_list)
-
-# else:
-#     print(response.status_code)
