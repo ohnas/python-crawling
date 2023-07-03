@@ -1,10 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36"
-}
-
 
 def today_idiom(headers):
     url = "https://www.theidioms.com/"
@@ -80,14 +76,3 @@ def all_idioms(headers):
                 idioms_list.append((name, link, meaning, example))
 
     return idioms_list
-
-
-try:
-    print("crawling...")
-    idiom = today_idiom(HEADERS)
-    idioms = all_idioms(HEADERS)
-    print("finish!")
-except requests.exceptions.HTTPError as err:
-    print(f"HTTP error occurred: {err}")
-except Exception as err:
-    print(f"An error occurred: {err}")
