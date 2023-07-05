@@ -17,7 +17,7 @@ def today_idiom(headers):
     return daily_tuple
 
 
-def all_idioms(headers):
+def idioms_last_page_numbers(headers):
     letters = [
         # "a",
         # "b",
@@ -46,21 +46,27 @@ def all_idioms(headers):
         "y",
         # "z",
     ]
-    last_page_numbers = []
+    letters_last_page_numbers = []
     for letter in letters:
         url = f"https://www.theidioms.com/{letter}/"
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         pno = soup.find("p", {"class": "pno"}).text.replace("Page 1 of ", "")
-        last_page_numbers.append(
+        letters_last_page_numbers.append(
             {
                 "letter": letter,
                 "last_page_number": int(pno),
             }
         )
+
+    return letters_last_page_numbers
+
+
+def all_idioms(headers):
+    items = idioms_last_page_numbers(headers)
     idioms_list = []
-    for item in last_page_numbers:
+    for item in items:
         for num in range(item["last_page_number"]):
             url = f"https://www.theidioms.com/{item['letter']}/page/{num + 1}/"
             response = requests.get(url, headers=headers)
