@@ -15,31 +15,35 @@ try:
     print("crawling...")
     # word = today_word(HEADERS)
     idiom = today_idiom(HEADERS)
-    print(idiom)
-    # con = sqlite3.connect("crawling.db")
-    # cur = con.cursor()
-    # cur.execute(
-    #     """
-    #     CREATE TABLE IF NOT EXISTS daily_idiom
-    #         (id INTEGER PRIMARY KEY, date text, name text, link text, meaning text, example text)
-    # """
-    # )
-    # cur.execute(
-    #     """
-    #     CREATE TABLE IF NOT EXISTS all_idioms
-    #         (id INTEGER PRIMARY KEY, name text, link text, meaning text, example text)
-    # """
-    # )
-    # cur.execute(
-    #     """
-    #     CREATE TABLE IF NOT EXISTS daily_word
-    #         (id INTEGER PRIMARY KEY, date text, word text, img_src text, link text)
-    # """
-    # )
-    # cur.execute('INSERT INTO daily_idiom VALUES (?,?,?,?,?)', idiom)
+    idiom.insert(0, TODAY)
+    idiom = tuple(idiom)
+    con = sqlite3.connect("crawling.db")
+    cur = con.cursor()
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS daily_idiom
+            (id INTEGER PRIMARY KEY, date text, name text, link text, meaning text, example text)
+    """
+    )
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS all_idioms
+            (id INTEGER PRIMARY KEY, name text, link text, meaning text, example text)
+    """
+    )
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS daily_word
+            (id INTEGER PRIMARY KEY, date text, word text, img_src text, link text)
+    """
+    )
+    cur.execute(
+        "INSERT INTO daily_idiom (date, name, link, meaning, example) VALUES (?,?,?,?,?)",
+        idiom,
+    )
 
-    # con.commit()
-    # con.close()
+    con.commit()
+    con.close()
     # idioms = all_idioms(HEADERS)
     # print("Today word :", word)
     # print("Today idiom :", idiom)

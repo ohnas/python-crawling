@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def today_idiom(headers):
+def today_idiom(headers, today):
     url = "https://www.theidioms.com/"
     response = requests.get(url, headers=headers)
     response.raise_for_status()
@@ -12,9 +12,9 @@ def today_idiom(headers):
     link = daily.contents[0].find("a")["href"]
     meaning = daily.contents[1].text
     example = daily.contents[2].text.replace("Read more ➺", "").rstrip()
-    daily_list = [name, link, meaning, example]
+    daily_tuple = (today, name, link, meaning, example)
 
-    return daily_list
+    return daily_tuple
 
 
 def idioms_last_page_numbers(headers):

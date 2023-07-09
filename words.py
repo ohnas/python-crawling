@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def today_word(headers):
+def today_word(headers, today):
     url = "https://www.britannica.com/dictionary/eb/word-of-the-day"
     response = requests.get(url, headers=headers)
     response.raise_for_status()
@@ -10,6 +10,6 @@ def today_word(headers):
     word = soup.find("span", {"class": "hw_txt georgia_font"}).text
     img_src = soup.find("div", {"class": "wod_img_act"}).find("img")["src"]
     link = f"https://www.britannica.com/dictionary/{word}"
-    daily_list = [word, img_src, link]
+    daily_tuple = (today, word, img_src, link)
 
-    return daily_list
+    return daily_tuple
