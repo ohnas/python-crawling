@@ -1,8 +1,8 @@
 from datetime import datetime
 import requests
-import sqlite3
 from idioms import today_idiom, all_idioms
 from words import today_word
+from dbmanager import DBManager
 
 
 HEADERS = {
@@ -13,42 +13,19 @@ TODAY = datetime.today().strftime("%Y-%m-%d")
 
 try:
     print("crawling...")
-    # word = today_word(HEADERS)
-    idiom = today_idiom(HEADERS)
-    idiom.insert(0, TODAY)
-    idiom = tuple(idiom)
-    con = sqlite3.connect("crawling.db")
-    cur = con.cursor()
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS daily_idiom
-            (id INTEGER PRIMARY KEY, date text, name text, link text, meaning text, example text)
-    """
-    )
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS all_idioms
-            (id INTEGER PRIMARY KEY, name text, link text, meaning text, example text)
-    """
-    )
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS daily_word
-            (id INTEGER PRIMARY KEY, date text, word text, img_src text, link text)
-    """
-    )
-    cur.execute(
-        "INSERT INTO daily_idiom (date, name, link, meaning, example) VALUES (?,?,?,?,?)",
-        idiom,
-    )
-
-    con.commit()
-    con.close()
-    # idioms = all_idioms(HEADERS)
-    # print("Today word :", word)
-    # print("Today idiom :", idiom)
-    # print("All idioms :", idioms)
-    print("finish!")
+    word = today_word(HEADERS, TODAY)
+    idiom = today_idiom(HEADERS, TODAY)
+    idioms = all_idioms(HEADERS)
+    print("crawling finish!!")
+    print("=================")
+    print("DB working...")
+    daily_word = DBManager("daily_word", word)
+    daily_word.create()
+    daily_idiom = DBManager("daily_idiom", idiom)
+    daily_idiom.create()
+    all_idiom = DBManager("all_idioms", idioms)
+    all_idiom.create()
+    print("DB finish!!")
 except requests.exceptions.HTTPError as err:
     print(f"HTTP error occurred: {err}")
 except Exception as err:
