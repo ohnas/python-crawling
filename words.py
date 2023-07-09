@@ -10,6 +10,6 @@ def today_word(headers):
     word = soup.find("span", {"class": "hw_txt georgia_font"}).text
     img_src = soup.find("div", {"class": "wod_img_act"}).find("img")["src"]
     link = f"https://www.britannica.com/dictionary/{word}"
-    daily_tuple = (word, img_src, link)
+    daily_list = [word, img_src, link]
 
-    return daily_tuple
+    return daily_list
