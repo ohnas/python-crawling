@@ -54,3 +54,12 @@ class DBManager:
 
     def delete(self):
         pass
+
+
+def is_empty():
+    con = sqlite3.connect("crawling.db")
+    cur = con.cursor()
+    cur.execute("SELECT COUNT(*) FROM all_idioms")
+    res = cur.fetchone()
+
+    return res[0]
