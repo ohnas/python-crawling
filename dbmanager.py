@@ -3,7 +3,10 @@ import sqlite3
 
 class DBManager:
     def __init__(self, table_name, data):
-        self.con = sqlite3.connect("crawling.db")
+        # cron으로 python script 실행할려면 로컬파일의 절대경로가 필요 상대경로일때는 홈 디렉토리에서 cron 이 실행되기때문에 찾지 못함
+        self.con = sqlite3.connect(
+            "/Users/ohnaseong/Documents/python-crawling/crawling.db"
+        )
         self.cur = self.con.cursor()
         self.cur.execute(
             """
@@ -57,7 +60,8 @@ class DBManager:
 
 
 def is_empty():
-    con = sqlite3.connect("crawling.db")
+    # cron으로 python script 실행할려면 로컬파일의 절대경로가 필요 상대경로일때는 홈 디렉토리에서 cron 이 실행되기때문에 찾지 못함
+    con = sqlite3.connect("/Users/ohnaseong/Documents/python-crawling/crawling.db")
     cur = con.cursor()
     cur.execute("SELECT COUNT(*) FROM all_idioms")
     res = cur.fetchone()
