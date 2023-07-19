@@ -1,4 +1,12 @@
 import sqlite3
+import logging
+
+logging.basicConfig(
+    encoding="utf-8",
+    level=logging.INFO,
+    format="%(levelname)s : %(asctime)s : %(message)s",
+    datefmt="%Y/%m/%d %I:%M:%S %p",
+)
 
 
 class DBManager:
@@ -30,24 +38,29 @@ class DBManager:
         self.data = data
 
     def create(self):
-        if self.table_name == "daily_idiom":
-            self.cur.execute(
-                "INSERT INTO daily_idiom (date, name, link, meaning, example) VALUES (?,?,?,?,?)",
-                self.data,
-            )
-        elif self.table_name == "daily_word":
-            self.cur.execute(
-                "INSERT INTO daily_word (date, word, img_src, link) VALUES (?,?,?,?)",
-                self.data,
-            )
-        elif self.table_name == "all_idioms":
-            self.cur.executemany(
-                "INSERT INTO all_idioms (name, link, meaning, example) VALUES (?,?,?,?)",
-                self.data,
-            )
+        try:
+            if self.table_name == "daily_idiom":
+                self.cur.execute(
+                    "INSERT INTO daily_idiom (date, name, link, meaning, example) VALUES (?,?,?,?,?)",
+                    self.data,
+                )
+            elif self.table_name == "daily_word":
+                self.cur.execute(
+                    "INSERT INTO daily_word (date, word, img_src, link) VALUES (?,?,?,?)",
+                    self.data,
+                )
+            elif self.table_name == "all_idioms":
+                self.cur.executemany(
+                    "INSERT INTO all_idioms (name, link, meaning, example) VALUES (?,?,?,?)",
+                    self.data,
+                )
 
-        self.con.commit()
-        self.con.close()
+            self.con.commit()
+            self.con.close()
+            logging.info("create is done.")
+
+        except Exception as err:
+            logging.error(f"An error occurred: {err} in create of DBManager")
 
     def read(self):
         pass
