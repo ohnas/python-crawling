@@ -29,7 +29,7 @@ try:
     daily_idiom.create()
 
     count = is_empty()
-    if count == None:
+    if count == 0:
         idioms = all_idioms(HEADERS)
         all_idiom = DBManager("all_idioms", idioms)
         all_idiom.create()

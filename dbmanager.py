@@ -1,5 +1,17 @@
-import sqlite3
+from dotenv import load_dotenv
+import os
+import pymysql
 import logging
+
+load_dotenv()
+
+HOST = os.environ.get("HOST")
+USER = os.environ.get("DB_USER")
+PASSWORD = os.environ.get("PASSWORD")
+DB_NAME = os.environ.get("DB_NAME")
+PORT = int(os.environ.get("PORT"))
+CHARSET = os.environ.get("CHARSET")
+
 
 logging.basicConfig(
     encoding="utf-8",
@@ -11,27 +23,31 @@ logging.basicConfig(
 
 class DBManager:
     def __init__(self, table_name, data):
-        # cron으로 python script 실행할려면 로컬파일의 절대경로가 필요 상대경로일때는 홈 디렉토리에서 cron 이 실행되기때문에 찾지 못함
-        self.con = sqlite3.connect(
-            "/Users/ohnaseong/Documents/python-crawling/crawling.db"
+        self.con = pymysql.connect(
+            host=HOST,
+            user=USER,
+            password=PASSWORD,
+            db=DB_NAME,
+            charset=CHARSET,
+            port=PORT,
         )
         self.cur = self.con.cursor()
         self.cur.execute(
             """
             CREATE TABLE IF NOT EXISTS daily_idiom
-                (id INTEGER PRIMARY KEY, date text, name text, link text, meaning text, example text)
+                (id INTEGER PRIMARY KEY AUTO_INCREMENT, date text, name text, link text, meaning text, example text)
         """
         )
         self.cur.execute(
             """
             CREATE TABLE IF NOT EXISTS all_idioms
-                (id INTEGER PRIMARY KEY, name text, link text, meaning text, example text)
+                (id INTEGER PRIMARY KEY AUTO_INCREMENT, name text, link text, meaning text, example text)
         """
         )
         self.cur.execute(
             """
             CREATE TABLE IF NOT EXISTS daily_word
-                (id INTEGER PRIMARY KEY, date text, word text, img_src text, link text)
+                (id INTEGER PRIMARY KEY AUTO_INCREMENT, date text, word text, img_src text, link text)
         """
         )
         self.table_name = table_name
@@ -41,17 +57,17 @@ class DBManager:
         try:
             if self.table_name == "daily_idiom":
                 self.cur.execute(
-                    "INSERT INTO daily_idiom (date, name, link, meaning, example) VALUES (?,?,?,?,?)",
+                    "INSERT INTO daily_idiom (date, name, link, meaning, example) VALUES (%s,%s,%s,%s,%s)",
                     self.data,
                 )
             elif self.table_name == "daily_word":
                 self.cur.execute(
-                    "INSERT INTO daily_word (date, word, img_src, link) VALUES (?,?,?,?)",
+                    "INSERT INTO daily_word (date, word, img_src, link) VALUES (%s,%s,%s,%s)",
                     self.data,
                 )
             elif self.table_name == "all_idioms":
                 self.cur.executemany(
-                    "INSERT INTO all_idioms (name, link, meaning, example) VALUES (?,?,?,?)",
+                    "INSERT INTO all_idioms (name, link, meaning, example) VALUES (%s,%s,%s,%s)",
                     self.data,
                 )
 
@@ -74,7 +90,14 @@ class DBManager:
 
 def is_empty():
     # cron으로 python script 실행할려면 로컬파일의 절대경로가 필요 상대경로일때는 홈 디렉토리에서 cron 이 실행되기때문에 찾지 못함
-    con = sqlite3.connect("/Users/ohnaseong/Documents/python-crawling/crawling.db")
+    con = pymysql.connect(
+        host=HOST,
+        user=USER,
+        password=PASSWORD,
+        db=DB_NAME,
+        charset=CHARSET,
+        port=PORT,
+    )
     cur = con.cursor()
     cur.execute("SELECT COUNT(*) FROM all_idioms")
     res = cur.fetchone()
