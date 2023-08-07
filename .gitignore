@@ -164,3 +164,6 @@ crawling.db
 
 #log directory
 log/
+
+#docker
+.dockerignore
